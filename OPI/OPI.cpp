@@ -9,7 +9,7 @@ using namespace std;
 int rotate_the_wheel();
 char enter_letter();
 int enter_number_of_letter(int size);
-bool open_letter(char letter, string& close_word, string open_word);
+int open_letter(char letter, string& close_word, string open_word);
 void open_any_letter(int index, string& close_word, string open_word);
 void On_Display(string description, string close_word, int* scores);
 vector<string> read_file(string filename);
@@ -75,9 +75,10 @@ int main()
 
         //Check letter
         char letter = enter_letter();
-        if (open_letter(letter, close_word, open_word)) {
+        int matching_letters = open_letter(letter, close_word, open_word);
+        if (matching_letters) {
             cout << "There is such a letter." << endl << endl;
-            scores[index_player] += score_on_wheel;
+            scores[index_player] += score_on_wheel * matching_letters;
         }
         else {
             cout << "There is not such a letter." << endl << endl;
@@ -86,14 +87,10 @@ int main()
 
     }
 
-    //Search a winner
-    int win_player_id = 0;
-    for (int i = 0; i < size(scores); i++) {
-        if (scores[i] > scores[win_player_id]) win_player_id = i;
-    }
+
     //Output
     cout << endl << "Word: " << close_word << endl;
-    cout << win_player_id + 1 << "st player wins with " << scores[win_player_id] << " points" << endl;
+    cout << index_player + 1 << "st player wins with " << scores[index_player] << " points" << endl;
 
     cout << endl << "The end." << endl;
     system("pause");
@@ -146,21 +143,21 @@ int enter_number_of_letter(int size)
     return index_letter;
 }
 
-bool open_letter(char letter, string& close_word, string open_word)
+int open_letter(char letter, string& close_word, string open_word)
 {
-    bool coincidence = false;
+    int matching_letters = 0;
     letter = toupper(letter);
 
     for (int i = 0; i < open_word.size(); i++) {
         if (open_word[i] == letter) {
             if (letter != close_word[i]) {
                 close_word[i] = letter;
-                coincidence = true;
+                matching_letters += 1;
             }
         }
     }
 
-    return coincidence;
+    return matching_letters;
 }
 
 void open_any_letter(int index, string& close_word, string open_word)

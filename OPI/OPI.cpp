@@ -3,11 +3,13 @@
 #include <fstream>
 #include <vector>
 #include <string>
+#include <locale>
+#include <codecvt>
 using namespace std;
 
 
 int rotate_the_wheel();
-char enter_letter();
+wchar_t enter_letter();
 int enter_number_of_letter(int size);
 bool open_letter(char letter, string& close_word, string open_word);
 void open_any_letter(int index, string& close_word, string open_word);
@@ -20,16 +22,22 @@ void next_player(int& index_player) {
     else index_player = 0;
 }
 
+locale loc("ru_RU.UTF-8");
+wchar_t to_upper(wchar_t ch)
+{
+    return use_facet<ctype<wchar_t>>(loc).toupper(ch);
+}
 
 int main()
 {
+    setlocale(LC_ALL, "ru_RU.UTF-8");
     int scores[3]{ 0,0,0 };
-    string open_word = "Vitim";
-    string close_word = "";
-    string description = "River in siberia";
+    wstring open_word = L"Vitim";
+    wstring close_word = L"";
+    wstring description = L"River in siberia";
 
     //open file
-    vector<string> file_contents = read_file("words.txt");
+    vector<wstring> file_contents = read_file("words.txt");
     srand(time(NULL));
     int end = file_contents.size();
     int index = 1;
@@ -40,7 +48,7 @@ int main()
         open_word = file_contents[index];
         description = file_contents[index + 1];
     }
-    for (int i = 0; i < open_word.size(); i++) open_word[i] = toupper(open_word[i]);
+    for (int i = 0; i < open_word.size(); i++) open_word[i] = to_upper(open_word[i]);
     for (int i = 0; i < open_word.size(); i++) close_word += '_';
 
     //start game
@@ -112,16 +120,16 @@ int rotate_the_wheel()
     return drump[r_num];
 }
 
-char enter_letter()
+wchar_t enter_letter()
 {
-    char alfavit[26] = { 'A', 'B', 'C', 'D','E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'};
-    char letter;
+    wchar_t alfavit[] = { L'А', L'Б', L'В', L'Г',L'Д', L'Е', L'Ё', L'Ж', L'З', L'И', L'Й', L'К', L'Л', L'М', L'Н', L'О', L'П', L'Р', L'С', L'Т', L'У', L'Ф', L'Х', L'Ц', L'Ч', L'Ш', L'Щ', L'Ъ', L'Ы', L'Ь', L'Э', L'Ю', L'Я'};
+    wchar_t letter;
     bool check_letter = true;
     while (check_letter) {
         cout << "Enter letter: \t\t";
-        cin >> letter;
-        for (char el : alfavit) {
-            if (toupper(letter) == el) check_letter = false;
+        wcin >> letter;
+        for (wchar_t el : alfavit) {
+            if (to_upper(letter) == el) check_letter = false;
         }
     }
     return letter;
@@ -175,24 +183,24 @@ void open_any_letter(int index, string& close_word, string open_word)
     }
 }
 
-void On_Display(string description, string close_word, int* scores)
+void On_Display(wstring description, wstring close_word, int* scores)
 {
-    cout << description << ":  " << close_word << "\n";
-    cout << "Balance players: \t" << "1 player\t" << "2 player\t" << "3 player\t" << endl;
-    cout << "\t\t\t" << scores[0] << "\t\t" << scores[1] << "\t\t" << scores[2] << endl;
+    wcout << description << ":  " << close_word << "\n";
+    wcout << L"Balance players: \t" << L"1 player\t" << L"2 player\t" << L"3 player\t" << endl;
+    wcout << L"\t\t\t" << scores[0] << L"\t\t" << scores[1] << L"\t\t" << scores[2] << endl;
     cout << endl;
 }
 
-vector<string> read_file(string filename)
+vector<wstring> read_file(wstring filename)
 {
     ifstream file(filename);
     if (!file.is_open()) {
         cout << "Error! The file with words could not be opened" << endl << endl;
-        return vector<string>();
+        return vector<wstring>();
     }
 
-    vector<string> file_contents;
-    string str;
+    vector<wstring> file_contents;
+    wstring str;
     for (int i = 0; !file.eof(); i++) {
         getline(file,str);
         file_contents.push_back(str);

@@ -113,8 +113,7 @@ int main()
 
     }
 
-
-    //Output
+   //Output
     cout << endl << "Поздравляем, вы отгадали слово: " << close_word << endl;
     cout << "Игрок " << index_player + 1 << " выигрывает со счетом " << scores[index_player] << " очков" << endl;
 
@@ -174,7 +173,6 @@ int open_letter(char letter, string& close_word, string open_word)
 {
     int matching_letters = 0;
     letter = to_upper(letter);
-
     for (int i = 0; i < open_word.size(); i++) {
         if (open_word[i] == letter) {
             if (letter != close_word[i]) {

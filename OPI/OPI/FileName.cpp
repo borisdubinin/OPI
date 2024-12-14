@@ -3,6 +3,9 @@
 #include <fstream>
 #include <vector>
 #include <string>
+#include <utility>
+#include <windows.h>
+#include "locale.h"
 using namespace std;
 
 
@@ -20,13 +23,35 @@ void next_player(int& index_player) {
     else index_player = 0;
 }
 
+char to_upper(char ch)
+{
+    if (ch >= 'а' && ch <= 'я') {
+        vector<pair<char, char>> big_and_small = { {'а', 'А'},{'б', 'Б'},{'в', 'В'},{'г', 'Г'},{'д', 'Д'},{'е', 'Е'},{'ё', 'Ё'},{'ж', 'Ж'},
+            {'з', 'З'},{'и', 'И'},{'й', 'Й'},{'к', 'К'},{'л', 'Л'},{'м', 'М'},{'н', 'Н'},{'о', 'О'},{'п', 'П'},{'р', 'Р'},{'с', 'С'},{'т', 'Т'},{'у', 'У'},
+            {'ф', 'Ф'},{'х', 'Х'},{'ц', 'Ц'},{'ч', 'Ч'},{'ш', 'Ш'},{'щ', 'Щ'},{'ъ', 'Ъ'},{'ы', 'Ы'},{'ь', 'Ь'},{'э', 'Э'},{'ю', 'Ю'},{'я', 'Я'},
+        };
+        for (auto par : big_and_small)
+        {
+            if (par.first == ch) {
+                ch = par.second;
+                return ch;
+            }
+        }
+    }
+
+    else
+    return ch;
+}
 
 int main()
 {
+    setlocale(LC_ALL, "ru");
+    SetConsoleCP(1251);
+    SetConsoleOutputCP(1251);
     int scores[3]{ 0,0,0 };
-    string open_word = "Vitim";
+    string open_word = "Витим";
     string close_word = "";
-    string description = "River in siberia";
+    string description = "Река в Сибири";
 
     //open file
     vector<string> file_contents = read_file("words.txt");
@@ -40,24 +65,25 @@ int main()
         open_word = file_contents[index];
         description = file_contents[index + 1];
     }
-    for (int i = 0; i < open_word.size(); i++) open_word[i] = toupper(open_word[i]);
+    for (int i = 0; i < open_word.size(); i++) open_word[i] = to_upper(open_word[i]);
     for (int i = 0; i < open_word.size(); i++) close_word += '_';
 
     //start game
     int index_player = 0;
     while (close_word != open_word) {
+        cout << endl << "--------------------------------------------------" << endl;
         On_Display(description, close_word, scores);
         system("pause");
 
         int score_on_wheel = rotate_the_wheel();
         if (score_on_wheel == 0) {
-            cout << index_player + 1 << "st player's turn\t" << "On the wheel\t" << "+" << endl;
+            cout  << "Ход игрока " << index_player + 1 << ".\tСектор \"+\" на барабане! " << endl;
         }
         else if (score_on_wheel == -1) {
-            cout << index_player + 1 << "st player's turn\t" << "On the wheel\t" << "Skip a turn" << endl;
+            cout << "Ход игрока " << index_player + 1 << ".\tСектор \"0\" на барабане! Ход переходит к следующему игроку. " << endl;
         }
         else {
-            cout << index_player + 1 << "st player's turn\t" << "On the wheel\t" << score_on_wheel << endl;
+            cout << "Ход игрока " << index_player + 1 << ".\t" << score_on_wheel << " очков на барабане! " << endl;
         }
 
         //Sector plus
@@ -77,11 +103,11 @@ int main()
         char letter = enter_letter();
         int matching_letters = open_letter(letter, close_word, open_word);
         if (matching_letters) {
-            cout << "There is such a letter." << endl << endl;
+            cout << "Вы правильно назвали букву." << endl << endl;
             scores[index_player] += score_on_wheel * matching_letters;
         }
         else {
-            cout << "There is not such a letter." << endl << endl;
+            cout << "Такой буквы нет." << endl << endl;
             next_player(index_player);
         }
 
@@ -89,10 +115,10 @@ int main()
 
 
     //Output
-    cout << endl << "Word: " << close_word << endl;
-    cout << index_player + 1 << "st player wins with " << scores[index_player] << " points" << endl;
+    cout << endl << "Поздравляем, вы отгадали слово: " << close_word << endl;
+    cout << "Игрок " << index_player + 1 << " выигрывает со счетом " << scores[index_player] << " очков" << endl;
 
-    cout << endl << "The end." << endl;
+    cout << endl << "Конец. " << endl;
     system("pause");
 }
 
@@ -111,14 +137,15 @@ int rotate_the_wheel()
 
 char enter_letter()
 {
-    char alfavit[26] = { 'A', 'B', 'C', 'D','E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z' };
+    char alfavit[33] = { 'А', 'Б', 'В', 'Г','Д', 'Е', 'Ё', 'Ж', 'З', 'И', 'Й' ,'К', 'Л', 'М', 'Н', 'О', 
+        'П', 'Р', 'С', 'Т', 'У', 'Ф', 'Х', 'Ц', 'Ч', 'Ш', 'Щ', 'Ъ', 'Ы', 'Ь', 'Э', 'Ю', 'Я'};
     char letter;
     bool check_letter = true;
     while (check_letter) {
-        cout << "Enter letter: \t\t";
+        cout << "Введите букву: \t\t";
         cin >> letter;
         for (char el : alfavit) {
-            if (toupper(letter) == el) check_letter = false;
+            if (to_upper(letter) == el) check_letter = false;
         }
     }
     return letter;
@@ -129,7 +156,7 @@ int enter_number_of_letter(int size)
     int index_letter;
 
     while (true) {
-        cout << "Number of letter: \t\t";
+        cout << "Номер буквы: \t\t";
         cin >> index_letter;
         if (cin.fail()) {
             cin.clear();
@@ -146,7 +173,7 @@ int enter_number_of_letter(int size)
 int open_letter(char letter, string& close_word, string open_word)
 {
     int matching_letters = 0;
-    letter = toupper(letter);
+    letter = to_upper(letter);
 
     for (int i = 0; i < open_word.size(); i++) {
         if (open_word[i] == letter) {
@@ -163,7 +190,7 @@ int open_letter(char letter, string& close_word, string open_word)
 void open_any_letter(int index, string& close_word, string open_word)
 {
     char letter;
-    letter = toupper(open_word[index]);
+    letter = to_upper(open_word[index]);
 
     for (int i = 0; i < open_word.size(); i++) {
         if (open_word[i] == letter) {
@@ -175,7 +202,7 @@ void open_any_letter(int index, string& close_word, string open_word)
 void On_Display(string description, string close_word, int* scores)
 {
     cout << description << ":  " << close_word << "\n";
-    cout << "Balance players: \t" << "1 player\t" << "2 player\t" << "3 player\t" << endl;
+    cout << "Баланс игроков: \t" << "Игрок 1\t\t" << "Игрок 2\t\t" << "Игрок 3\t\t" << endl;
     cout << "\t\t\t" << scores[0] << "\t\t" << scores[1] << "\t\t" << scores[2] << endl;
     cout << endl;
 }
@@ -184,7 +211,7 @@ vector<string> read_file(string filename)
 {
     ifstream file(filename);
     if (!file.is_open()) {
-        cout << "Error! The file with words could not be opened" << endl << endl;
+        cout << "Ошибка! Файл со словами открыть не удалось!" << endl << endl;
         return vector<string>();
     }
 

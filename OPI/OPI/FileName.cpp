@@ -66,7 +66,7 @@ int main()
         description = file_contents[index + 1];
     }
     for (int i = 0; i < open_word.size(); i++) open_word[i] = to_upper(open_word[i]);
-    for (int i = 0; i < open_word.size(); i++) close_word += '_';
+    for (int i = 0; i < open_word.size(); i++) close_word += '*';
 
     //start game
     int index_player = 0;
@@ -143,6 +143,7 @@ char enter_letter()
     while (check_letter) {
         cout << "¬ведите букву: \t\t";
         cin >> letter;
+        cin.ignore(32767, '\n');
         for (char el : alfavit) {
             if (to_upper(letter) == el) check_letter = false;
         }

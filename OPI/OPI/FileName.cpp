@@ -74,7 +74,7 @@ int main()
         cout << endl << "--------------------------------------------------" << endl;
         On_Display(description, close_word, scores);
         system("pause");
-
+        cout << endl << endl;
         int score_on_wheel = rotate_the_wheel();
         if (score_on_wheel == 0) {
             cout  << "Ход игрока " << index_player + 1 << ".\tСектор \"+\" на барабане! " << endl;
